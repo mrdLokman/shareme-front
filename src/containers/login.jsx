@@ -3,13 +3,27 @@ import GoogleLogin from 'react-google-login';
 import { useNavigate } from 'react-router-dom';
 import { logo, IntroVideo } from '../assets';
 import { FcGoogle } from 'react-icons/fc';
-
+import { client } from '../api/sanityClient'
 
 
 const Login = () => {
 
+    const navigate = useNavigate();
+
     const responseGoogle = (response) => {
-        console.log(response);
+        localStorage.setItem('user', response.profileObj);
+        const { name, googleId, imageUrl } = response.profileObj;
+        const doc ={
+            '_id' : googleId,
+            '_type': 'user',
+            'username': name,
+            'image': imageUrl
+        }
+
+        client.createIfNotExists(doc).then(()=>{
+            navigate('/', { replace: true });
+        })
+
     }
 
   return (
